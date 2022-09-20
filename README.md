@@ -177,12 +177,83 @@ Create Adapter Class for onboarding in the package of the project
 
 After creating OnboardingAdapter extend it to RecyclerView.Adapter
 ```
+
 public class OnboardingAdapter extends RecyclerView.Adapter<OnboardingAdapter.onboardingViewHolder>
+
+
 ```
 
-Create inside another class inside it named onboardingViewHolder and extend to RecyclerView.ViewHolder
+Implement all the methods
+
+![image](https://user-images.githubusercontent.com/84573685/191240294-691c30ab-ceea-453e-b3de-fd91ba66cf6f.png)
+
+Declare the List
 ```
+
+
+private List<OnboardingItems> onboardingItems;
+
+
+```
+
+Generate Constructor for the OnboardingItems List
+
+![image](https://user-images.githubusercontent.com/84573685/191241039-de729b6a-dc83-475d-b2c0-283f341b1f10.png)
+
+```
+
+public OnboardingAdapter(List<OnboardingItems> onboardingItems) {
+    this.onboardingItems = onboardingItems;
+}
+    
+```
+
+
+
+Edit onboardingViewHolder
+
+Return it to onboardingViewHolder then inflate the view
+
+```
+
+
+return new onboardingViewHolder(
+        LayoutInflater.from(parent.getContext()).inflate(
+                R.layout.onboarding_items, parent, false
+        )
+);
+        
+        
+```
+
+
+Edit the method onBindViewHolder and getItemCount
+
+```
+
+@Override
+public void onBindViewHolder(@NonNull onboardingViewHolder holder, int position) {
+    holder.setOnboardingData(onboardingItems.get(position));
+}
+
+@Override
+public int getItemCount() {
+    return onboardingItems.size();
+}
+    
+```
+
+
+
+
+
+Create another class named onboardingViewHolder and extend to RecyclerView.ViewHolder
+```
+
+
 class onboardingViewHolder extends RecyclerView.ViewHolder
+
+
 ```
 
 Declare the variables needed 
@@ -215,6 +286,407 @@ void setOnboardingData(OnboardingItems onboardingItems){
     imageOnboarding.setImageResource(onboardingItems.getImage());
 }
 ```
+
+## MainActivity.java
+
+Declare OnboardingAdapter on MainActivity
+
+```
+OnboardingAdapter onboardingAdapter;
+```
+
+Create another method for the Arraylist of Onboarding Screens
+```
+private void setupOnboardingItems(){}
+```
+
+Declare the List
+```
+List<OnboardingItems> onboardingItems = new ArrayList<>();
+```
+
+Set the data per variables and appened  
+```
+OnboardingItems featuresItemsFirst = new OnboardingItems();
+featuresItemsFirst.setTitle("List of Features First");
+featuresItemsFirst.setDescription("There are various of features items in our application for safeplace");
+featuresItemsFirst.setImage(R.drawable.feat_1);
+
+onboardingItems.add(featuresItemsFirst);
+onboardingItems.add(featuresItemsSecond);
+onboardingItems.add(featuresItemsThird);
+onboardingItems.add(featuresItemsFourth);
+```
+
+Connect onboardingItems and OnboardingAdapter
+```
+onboardingAdapter = new OnboardingAdapter(onboardingItems);
+```
+
+## Whole Code for the method setupOnboardingItems()
+```
+private void setupOnboardingItems(){
+List<OnboardingItems> onboardingItems = new ArrayList<>();
+
+OnboardingItems featuresItemsFirst = new OnboardingItems();
+featuresItemsFirst.setTitle("List of Features First");
+featuresItemsFirst.setDescription("There are various of features items in our application for safeplace");
+featuresItemsFirst.setImage(R.drawable.feat_1);
+
+
+OnboardingItems featuresItemsSecond = new OnboardingItems();
+featuresItemsSecond.setTitle("List of Features Second");
+featuresItemsSecond.setDescription("There are various of features items in our application for safeplace");
+featuresItemsSecond.setImage(R.drawable.feat_2);
+
+
+OnboardingItems featuresItemsThird = new OnboardingItems();
+featuresItemsThird.setTitle("List of Features Third");
+featuresItemsThird.setDescription("There are various of features items in our application for safeplace");
+featuresItemsThird.setImage(R.drawable.feat_3);
+
+OnboardingItems featuresItemsFourth = new OnboardingItems();
+featuresItemsFourth.setTitle("List of Features Fourth");
+featuresItemsFourth.setDescription("There are various of features items in our application for safeplace");
+featuresItemsFourth.setImage(R.drawable.feat_4);
+
+onboardingItems.add(featuresItemsFirst);
+onboardingItems.add(featuresItemsSecond);
+onboardingItems.add(featuresItemsThird);
+onboardingItems.add(featuresItemsFourth);
+
+onboardingAdapter = new OnboardingAdapter(onboardingItems);
+}
+    
+```
+
+
+In the onCreate Method
+
+Declare the ViewPager2
+```
+final ViewPager2 onboardingViewPager = findViewById(R.id.onboardingViewpager);
+```
+
+call the method setupOnboardingItems
+```
+setupOnboardingItems();
+```
+
+Pass the ViewPager2 onboardingViewPager to the adapter onboardingAdapter
+```
+onboardingViewPager.setAdapter(onboardingAdapter);
+```
+
+### **After this Test the application you should swipe and see all the screen that you set**
+
+## Dot indicator
+
+### Showing of indicator 
+
+Declare LinearLayout on MainActivity
+```
+LinearLayout layoutOnboardingIndicator;
+```
+
+Find id for the LinearLayout layoutOnboardingIndicator
+```
+layoutOnboardingIndicator = findViewById(R.id.layoutOnboardingIndicator);
+```
+
+Create method setupOnboardingIndicator this method will make the dot indicator show and it will get the number of screens in the array and will show it 
+
+```
+private void setupOnboardingIndicator(){
+    ImageView[] indicators = new ImageView[onboardingAdapter.getItemCount()];
+    LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(
+            ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT
+    );
+    layoutParams.setMargins(8,0,8,0);
+
+    for (int i = 0; i <indicators.length ; i++) {
+        indicators[i] = new ImageView(getApplicationContext());
+        indicators[i].setImageDrawable(ContextCompat.getDrawable(
+                getApplicationContext(),
+                R.drawable.onboarding_indicator_inactive
+        ));
+
+        indicators[i].setLayoutParams(layoutParams);
+        layoutOnboardingIndicator.addView(indicators[i]);
+    }
+}
+```
+
+Dont Forget to declare the method in the OnCreate
+```
+setupOnboardingIndicator();
+```
+
+### Indicator will now move depends on its page position
+
+create method setCurrentOnboardingIndicator
+```
+private void setCurrentOnboardingIndicator(int index){
+    int childCount = layoutOnboardingIndicator.getChildCount();
+    for(int i=0; i<childCount; i++){
+        ImageView imageView = (ImageView) layoutOnboardingIndicator.getChildAt(i);
+        if(i == index){
+            imageView.setImageDrawable(ContextCompat.getDrawable(getApplicationContext(),R.drawable.onboarding_indicator_active));
+        }
+        else {
+            imageView.setImageDrawable(ContextCompat.getDrawable(getApplicationContext(),R.drawable.onboarding_indicator_inactive));
+        }
+    }
+}
+```
+
+Call the method inside the OnCreate method
+```
+setCurrentOnboardingIndicator(0);
+```
+
+Still inside the OnCreate Method Call the registerOnPageChangeCallback for the dot indicator to move
+```
+onboardingViewPager.registerOnPageChangeCallback(new ViewPager2.OnPageChangeCallback() {
+    @Override
+    public void onPageSelected(int position) {
+        super.onPageSelected(position);
+        setCurrentOnboardingIndicator(position);
+    }
+});
+```
+
+
+### CREATE ANOTHER EMPTY ACTIVITY FOR THE BUTTON TEST
+
+### Change the text of button if it's in the last screen
+
+Declare MaterialButton buttonOnboaringAction on MainActivity
+```
+MaterialButton buttonOnboaringAction;
+```
+
+Find the id of the button
+```
+ buttonOnboaringAction = findViewById(R.id.buttonOnboardingAction);
+```
+
+Still inside the OnCreate Method set an OnClickLister
+```
+buttonOnboaringAction.setOnClickListener(new View.OnClickListener() {
+    @Override
+    public void onClick(View view) {
+        if(onboardingViewPager.getCurrentItem() + 1 < onboardingAdapter.getItemCount()){
+            onboardingViewPager.setCurrentItem(onboardingViewPager.getCurrentItem() + 1);
+        }
+        else {
+           startActivity(new Intent(getApplicationContext(),LoginActivity.class));
+           finish();
+        }
+    }
+});
+```
+
+Inside the setCurrentOnboardingIndicator Method put the the if else condition below to change the text of the button
+```
+private void setCurrentOnboardingIndicator(int index){
+    int childCount = layoutOnboardingIndicator.getChildCount();
+    for(int i=0; i<childCount; i++){
+        ImageView imageView = (ImageView) layoutOnboardingIndicator.getChildAt(i);
+        if(i == index){
+            imageView.setImageDrawable(ContextCompat.getDrawable(getApplicationContext(),R.drawable.onboarding_indicator_active));
+        }
+        else {
+            imageView.setImageDrawable(ContextCompat.getDrawable(getApplicationContext(),R.drawable.onboarding_indicator_inactive));
+        }
+    }
+
+    if (index == onboardingAdapter.getItemCount() - 1){
+        buttonOnboaringAction.setText("Start");
+    }
+    else {
+        buttonOnboaringAction.setText("Next");
+    }
+
+}
+```
+
+## Code for the MainActivity.java
+```
+package org.tup.onboardingscreen;
+
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
+import androidx.viewpager2.widget.ViewPager2;
+
+import android.content.Intent;
+import android.os.Bundle;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+
+import com.google.android.material.button.MaterialButton;
+
+import java.util.ArrayList;
+import java.util.List;
+
+public class MainActivity extends AppCompatActivity {
+
+    OnboardingAdapter onboardingAdapter;
+    LinearLayout layoutOnboardingIndicator;
+    MaterialButton buttonOnboaringAction;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+
+        layoutOnboardingIndicator = findViewById(R.id.layoutOnboardingIndicator);
+        buttonOnboaringAction = findViewById(R.id.buttonOnboardingAction);
+        final ViewPager2 onboardingViewPager = findViewById(R.id.onboardingViewpager);
+
+
+        setupOnboardingItems();
+        onboardingViewPager.setAdapter(onboardingAdapter);
+
+        setupOnboardingIndicator();
+        setCurrentOnboardingIndicator(0);
+
+
+        onboardingViewPager.registerOnPageChangeCallback(new ViewPager2.OnPageChangeCallback() {
+            @Override
+            public void onPageSelected(int position) {
+                super.onPageSelected(position);
+                setCurrentOnboardingIndicator(position);
+            }
+        });
+
+
+        buttonOnboaringAction.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if(onboardingViewPager.getCurrentItem() + 1 < onboardingAdapter.getItemCount()){
+                    onboardingViewPager.setCurrentItem(onboardingViewPager.getCurrentItem() + 1);
+                }
+                else {
+                   startActivity(new Intent(getApplicationContext(),LoginActivity.class));
+                   finish();
+                }
+            }
+        });
+
+    }
+
+
+    //ArrayList of Onboarding Screens
+    private void setupOnboardingItems(){
+        List<OnboardingItems> onboardingItems = new ArrayList<>();
+
+        OnboardingItems featuresItemsFirst = new OnboardingItems();
+        featuresItemsFirst.setTitle("List of Features First");
+        featuresItemsFirst.setDescription("There are various of features items in our application for safeplace");
+        featuresItemsFirst.setImage(R.drawable.feat_1);
+
+
+        OnboardingItems featuresItemsSecond = new OnboardingItems();
+        featuresItemsSecond.setTitle("List of Features Second");
+        featuresItemsSecond.setDescription("There are various of features items in our application for safeplace");
+        featuresItemsSecond.setImage(R.drawable.feat_2);
+
+
+        OnboardingItems featuresItemsThird = new OnboardingItems();
+        featuresItemsThird.setTitle("List of Features Third");
+        featuresItemsThird.setDescription("There are various of features items in our application for safeplace");
+        featuresItemsThird.setImage(R.drawable.feat_3);
+
+        OnboardingItems featuresItemsFourth = new OnboardingItems();
+        featuresItemsFourth.setTitle("List of Features Fourth");
+        featuresItemsFourth.setDescription("There are various of features items in our application for safeplace");
+        featuresItemsFourth.setImage(R.drawable.feat_4);
+
+        onboardingItems.add(featuresItemsFirst);
+        onboardingItems.add(featuresItemsSecond);
+        onboardingItems.add(featuresItemsThird);
+        onboardingItems.add(featuresItemsFourth);
+
+        onboardingAdapter = new OnboardingAdapter(onboardingItems);
+    }
+
+
+    private void setupOnboardingIndicator(){
+        ImageView[] indicators = new ImageView[onboardingAdapter.getItemCount()];
+        LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(
+                ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT
+        );
+        layoutParams.setMargins(8,0,8,0);
+
+        for (int i = 0; i <indicators.length ; i++) {
+            indicators[i] = new ImageView(getApplicationContext());
+            indicators[i].setImageDrawable(ContextCompat.getDrawable(
+                    getApplicationContext(),
+                    R.drawable.onboarding_indicator_inactive
+            ));
+
+            indicators[i].setLayoutParams(layoutParams);
+            layoutOnboardingIndicator.addView(indicators[i]);
+        }
+    }
+
+    private void setCurrentOnboardingIndicator(int index){
+        int childCount = layoutOnboardingIndicator.getChildCount();
+        for(int i=0; i<childCount; i++){
+            ImageView imageView = (ImageView) layoutOnboardingIndicator.getChildAt(i);
+            if(i == index){
+                imageView.setImageDrawable(ContextCompat.getDrawable(getApplicationContext(),R.drawable.onboarding_indicator_active));
+            }
+            else {
+                imageView.setImageDrawable(ContextCompat.getDrawable(getApplicationContext(),R.drawable.onboarding_indicator_inactive));
+            }
+        }
+
+        if (index == onboardingAdapter.getItemCount() - 1){
+            buttonOnboaringAction.setText("Start");
+        }
+        else {
+            buttonOnboaringAction.setText("Next");
+        }
+
+    }
+
+
+
+}
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
